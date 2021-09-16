@@ -326,11 +326,6 @@ Bits Bits::divide_int(const Bits& num_2)
 
 Bits Bits::divide_float(const Bits& num_2)
 {
-    if(compare_absolutes(*this, num_2) == 1)
-    {
-        std::cout << "Illegal function usage. Stop it, get some help." << std::endl;
-        exit(1);
-    }
     Bits result;
     Bits divident(*this);
     divident.bits[31] = 0;
@@ -379,6 +374,12 @@ Bits Bits::divide_float(const Bits& num_2)
     }
     if((this->bits[31] ^ num_2.bits[31]) == 1) result.bits[31] = 1;
     return result;
+}
+
+Bits Bits::divide(const Bits& num_2)
+{
+    if(compare_absolutes(*this, num_2) == -1) return this->divide_float(num_2);
+    else return this->divide_int(num_2);
 }
 
 Bits Bits::FP_sum(const Bits& num_2)

@@ -116,13 +116,13 @@ TEST_CASE("Division test with int result")
     Bits num_3(-8);
     Bits num_4(4);
 
-    REQUIRE(num_1.divide_int(num_2) == -0b1001);
+    REQUIRE(num_1.divide(num_2) == -0b1001);
 
-    REQUIRE(num_2.divide_int(num_3) == -0b0);
+    REQUIRE(num_3.divide(num_2) == -0b10);
 
-    REQUIRE(num_3.divide_int(num_1) == 0b0);
+    REQUIRE(num_1.divide(num_3) == 0b11);
 
-    REQUIRE(num_1.divide_int(num_4) == -0b110);
+    REQUIRE(num_1.divide(num_4) == -0b110);
 }
 
 TEST_CASE("Division test with float result")
@@ -132,13 +132,13 @@ TEST_CASE("Division test with float result")
     Bits num_3(-3);
     Bits num_4(-12);
 
-    REQUIRE(num_1.divide_float(num_2) == 0b01010);
+    REQUIRE(num_1.divide(num_2) == 0b01010);
 
-    REQUIRE(num_3.divide_float(num_2) == -0b10000);
+    REQUIRE(num_3.divide(num_2) == -0b10000);
 
-    REQUIRE(num_3.divide_float(num_4) == 0b01000);
+    REQUIRE(num_3.divide(num_4) == 0b01000);
 
-    REQUIRE(num_1.divide_float(num_4) == -0b00101);
+    REQUIRE(num_1.divide(num_4) == -0b00101);
 }
 
 TEST_CASE("Sum in floating point format test")

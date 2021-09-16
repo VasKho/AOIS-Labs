@@ -8,6 +8,8 @@ class Bits
 {
     private:
         std::bitset<32> bits;
+        Bits divide_int(const Bits&);
+        Bits divide_float(const Bits&);
     public:
         Bits(const int& = 0);
         Bits(const Bits&);
@@ -21,8 +23,7 @@ class Bits
         Bits subtract_first_completion(const Bits&);
         Bits subtract_second_completion(const Bits&);
         Bits multiply(const Bits&);
-        Bits divide_int(const Bits&);
-        Bits divide_float(const Bits&);
+        Bits divide(const Bits&);
         Bits FP_sum(const Bits&);
         short compare_absolutes(const Bits&, const Bits&);
         int size() const;
