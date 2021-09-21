@@ -132,13 +132,13 @@ TEST_CASE("Division test with float result")
     Bits num_3(-3);
     Bits num_4(-12);
 
-    REQUIRE(num_1.divide(num_2) == 0b01010);
+    REQUIRE(num_1.divide(num_2) == 0b00101);
 
     REQUIRE(num_3.divide(num_2) == -0b10000);
 
     REQUIRE(num_3.divide(num_4) == 0b01000);
 
-    REQUIRE(num_1.divide(num_4) == -0b00101);
+    REQUIRE(num_1.divide(num_4) == -0b00010);
 }
 
 TEST_CASE("Sum in floating point format test")

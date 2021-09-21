@@ -331,22 +331,24 @@ Bits Bits::divide_float(const Bits& num_2)
     divident.bits[31] = 0;
     Bits divisor(num_2);
     divisor.bits[31] = 0;
-    int divident_size = divident.size();
+    int res_bit = 5;
+    while(compare_absolutes(divident, divisor) == -1) 
+    {
+        divident << 1;
+        result.bits[res_bit--] = 0;
+    }
     int divisor_size = num_2.size();
-    while(compare_absolutes(divident, divisor) == -1) divident << 1;
     if(divisor_size < 0)
     {
         std::cout << "DivisionByZero" << std::endl;
         exit(1);
     }
-    int divisor_shift = divisor_size - divident_size;
-    divisor << divisor_shift;
     Bits neg_divisor = divisor;
     neg_divisor.bits[31] = 1;
     neg_divisor.to_second_completion();
     Bits remaining = divident;
     Bits zero(0);
-    for(int res_bit = 5; res_bit >= 0; --res_bit)
+    for(; res_bit >= 0; --res_bit)
     {
         Bits temp_remaining;
         bool carry = 0;
