@@ -12,7 +12,7 @@ def find_type_of_function(function):
     result_flag = re.search(r"^~?(\w|True|False)(\*~?(\w|True|False))*(\s\+\s~?(\w|True|False)(\*~?(\w|True|False))*)*$", function)
     type_of_func = TYPE_OF_FUNC.DISJUNCTIVE
     if result_flag is None:
-        result_flag = re.search(r"^~?\w(\+~?\w)*(\s\*\s~?\w(\+~?\w)*)*$", function)
+        result_flag = re.search(r"^\(?~?\w(\+~?\w\)?)*(\s\*\s\(?~?\w(\+~?\w\)?)*)*$", function)
         type_of_func = TYPE_OF_FUNC.CONJUNCTIVE
     if result_flag is None:
         raise Exception("Invalid input!")
@@ -47,11 +47,11 @@ def joining_rule(function):
         result = " + ".join(result)
     else:
         result = " * ".join(result)
-    if len(function_splitted) == 1:
+    for remaining in function_splitted:
         if type_of_func == TYPE_OF_FUNC.DISJUNCTIVE:
-            result += ' + ' + "*".join(function_splitted[0])
+            result += ' + ' + "*".join(remaining)
         else:
-            result += ' * ' + "+".join(function_splitted[0])
+            result += ' * ' + "+".join(remaining)
     return result
 
 
@@ -144,7 +144,7 @@ def minimize_in_table(perfect_form):
     else:
         for implicant in range(len(result)):
             result[implicant] = "+".join(result[implicant])
-            minimal_form += '( ' + minimal_form[implicant] + ' )' + ' * '
+            minimal_form += '(' + result[implicant] + ')' + ' * '
     print(minimal_form[: len(minimal_form) - 3])
     return minimal_form[: len(minimal_form) - 3]
 
@@ -178,7 +178,7 @@ def find_kernel(perfect_form):
     else:
         for implicant in range(len(kernel)):
             kernel[implicant] = "+".join(kernel[implicant])
-            kernel_result += '( ' + kernel[implicant] + ' )' + ' * '
+            kernel_result += '(' + kernel[implicant] + ')' + ' * '
     kernel_result = kernel_result[: len(kernel_result) - 3]
     return kernel_result
 
@@ -192,6 +192,8 @@ def split_function(function):
         for elem in function:
             function_splitted.append(elem.split('*'))
     else:
+        function = function.replace('(', '')
+        function = function.replace(')', '')
         function = function.split(' * ')
         for elem in function:
             function_splitted.append(elem.split('+'))
@@ -199,6 +201,6 @@ def split_function(function):
 
 
 # print(find_odd("c*~a + c*~b + ~b*a + ~c*a"))
-minimize_in_table("~a*~b*c + a*~b*~c + a*~b*c + a*b*~c + a*b*c")
+# minimize_in_table("~a*~b*c + a*~b*~c + a*~b*c + a*b*~c + a*b*c")
 
-# minimize_in_table("a+b+~c * a+~b+c * a+~b+~c * ~a+b+~c")
+minimize_in_table("(a+b+~c) * (a+~b+c) * (a+~b+~c) * (~a+b+~c)")
