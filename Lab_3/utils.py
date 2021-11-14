@@ -1,11 +1,32 @@
 import re
 import numpy
 from enum import Enum
+from parser import build_truth_table
 
 
 class TYPE_OF_FUNC(Enum):
     DISJUNCTIVE = 0
     CONJUNCTIVE = 1
+
+
+def translate_to_implicant(pair, entrance):
+    surrounding_translator = [
+        [('~a', '~b'), ('~a', '~c'), ('~b', '~c'), ('~b'), ('~c'), ('~a', '~b', '~c')],
+        [('~a', 'c'), ('~a', '~b'), ('~b', 'c'), ('c'), ('~b'), ('~a', '~b', 'c')],
+        [('~a', 'b'), ('~a', 'c'), ('b', 'c'), ('b'), ('c'), ('~a', 'b', 'c')],
+        [('~a', '~c'), ('~a', 'b'), ('b', '~c'), ('~c'), ('b'), ('~a', 'b', '~c')],
+        [('a', '~b'), ('a', '~c'), ('~b', '~c'), ('~b'), ('~c'), ('a', '~b', '~c')],
+        [('a', 'c'), ('a', '~b'), ('~b', 'c'), ('c'), ('~b'), ('a', '~b', 'c')],
+        [('a', 'b'), ('a', 'c'), ('b', 'c'), ('b'), ('c'), ('a', 'b', 'c')],
+        [('a', '~c'), ('a', 'b'), ('b', '~c'), ('~c'), ('b'), ('a', 'b', '~c')],
+        ]
+    index = 0
+    for row in range(2):
+        for col in range(4):
+            if pair == (row, col):
+                return surrounding_translator[index][entrance]
+            index += 1
+    raise Exception("Index is out of range!")
 
 
 def find_type_of_function(function):
@@ -118,3 +139,61 @@ def find_kernel(perfect_form):
             kernel_result += '(' + kernel[implicant] + ')' + ' * '
     kernel_result = kernel_result[: len(kernel_result) - 3]
     return kernel_result
+
+
+def build_KMap(perfect_form):
+    truth_table = build_truth_table(perfect_form)
+    KMap_template = numpy.zeros(shape=(2, 4))
+    KMap_template[0][0] = truth_table[3][0]
+    KMap_template[0][1] = truth_table[3][1]
+    KMap_template[0][3] = truth_table[3][2]
+    KMap_template[0][2] = truth_table[3][3]
+    KMap_template[1][0] = truth_table[3][4]
+    KMap_template[1][1] = truth_table[3][5]
+    KMap_template[1][3] = truth_table[3][6]
+    KMap_template[1][2] = truth_table[3][7]
+    return KMap_template
+
+
+def find_surrounding(KMap, position):
+    surrounding = numpy.zeros(shape=(2, 3))
+    surrounding[position[0]][1] = KMap[position]
+    if position[0] == 0:
+        if position[1] == 0:
+            surrounding[0][0] = KMap[position[0]][KMap.shape[1] - 1]
+            surrounding[0][2] = KMap[position[0]][position[1] + 1]
+            surrounding[1][0] = KMap[position[0] + 1][KMap.shape[1] - 1]
+            surrounding[1][1] = KMap[position[0] + 1][position[1]]
+            surrounding[1][2] = KMap[position[0] + 1][position[1] + 1]
+        elif position[1] == KMap.shape[1] - 1:
+            surrounding[0][0] = KMap[position[0]][position[1] - 1]
+            surrounding[0][2] = KMap[position[0]][0]
+            surrounding[1][0] = KMap[position[0] + 1][position[1] - 1]
+            surrounding[1][1] = KMap[position[0] + 1][position[1]]
+            surrounding[1][2] = KMap[position[0] + 1][0]
+        else:
+            surrounding[0][0] = KMap[position[0]][position[1] - 1]
+            surrounding[0][2] = KMap[position[0]][position[1] + 1]
+            surrounding[1][0] = KMap[position[0] + 1][position[1] - 1]
+            surrounding[1][1] = KMap[position[0] + 1][position[1]]
+            surrounding[1][2] = KMap[position[0] + 1][position[1] + 1]
+    elif position[0] == 1:
+        if position[1] == 0:
+            surrounding[0][0] = KMap[position[0] - 1][KMap.shape[1] - 1]
+            surrounding[0][1] = KMap[position[0] - 1][position[1]]
+            surrounding[0][2] = KMap[position[0] - 1][position[1] + 1]
+            surrounding[1][0] = KMap[position[0]][KMap.shape[1] - 1]
+            surrounding[1][2] = KMap[position[0]][position[1] + 1]
+        elif position[1] == KMap.shape[1] - 1:
+            surrounding[0][0] = KMap[position[0] - 1][position[1] - 1]
+            surrounding[0][1] = KMap[position[0] - 1][position[1]]
+            surrounding[0][2] = KMap[position[0] - 1][0]
+            surrounding[1][0] = KMap[position[0]][position[1] - 1]
+            surrounding[1][2] = KMap[position[0]][0]
+        else:
+            surrounding[0][0] = KMap[position[0] - 1][position[1] - 1]
+            surrounding[0][1] = KMap[position[0] - 1][position[1]]
+            surrounding[0][2] = KMap[position[0] - 1][position[1] + 1]
+            surrounding[1][0] = KMap[position[0]][position[1] - 1]
+            surrounding[1][2] = KMap[position[0]][position[1] + 1]
+    return surrounding

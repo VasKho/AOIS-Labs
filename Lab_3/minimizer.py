@@ -1,8 +1,5 @@
 import numpy
-from parser import (
-        build_truth_table,
-        print_truth_table
-)
+
 
 from utils import (
         TYPE_OF_FUNC,
@@ -10,7 +7,10 @@ from utils import (
         split_function,
         represent_in_values,
         joining_rule,
-        find_kernel
+        find_kernel,
+        build_KMap,
+        find_surrounding,
+        translate_to_implicant
 )
 
 
@@ -93,25 +93,65 @@ def minimize_Quine(perfect_form):
     return minimal_form[: len(minimal_form) - 3]
 
 
-def minimize_KMap(perfect_from):
-    truth_table = build_truth_table(perfect_from)
-    print_truth_table(truth_table)
-    KMap_template = numpy.zeros(shape=(2, 4))
-    KMap_template[0][0] = truth_table[3][0]
-    KMap_template[0][1] = truth_table[3][1]
-    KMap_template[0][3] = truth_table[3][2]
-    KMap_template[0][2] = truth_table[3][3]
-    KMap_template[1][0] = truth_table[3][4]
-    KMap_template[1][1] = truth_table[3][5]
-    KMap_template[1][3] = truth_table[3][6]
-    KMap_template[1][2] = truth_table[3][7]
-    print(KMap_template)
+def minimize_KMap(perfect_form):
+    KMap_template = build_KMap(perfect_form)
+    valuable_number = 1
+    type_of_func = find_type_of_function(perfect_form)
+    if type_of_func == TYPE_OF_FUNC.CONJUNCTIVE:
+        valuable_number = 0
+    minimized = set()
     col_iter, row_iter = 0, 0
     while row_iter < KMap_template.shape[0]:
         while col_iter < KMap_template.shape[1]:
-            print(col_iter, row_iter)
+            surrounding = find_surrounding(KMap_template, (row_iter, col_iter))
+            if row_iter == 0:
+                if surrounding[row_iter][1] == valuable_number:
+                    if surrounding[row_iter][2] == valuable_number:
+                        if surrounding[row_iter + 1][1] == valuable_number and surrounding[row_iter + 1][2] == valuable_number:
+                            minimized.add(translate_to_implicant((row_iter, col_iter), 3))
+                        else:
+                            minimized.add(translate_to_implicant((row_iter, col_iter), 0))
+                    elif surrounding[row_iter][0] == valuable_number:
+                        if surrounding[row_iter + 1][1] == valuable_number and surrounding[row_iter + 1][0] == valuable_number:
+                            minimized.add(translate_to_implicant((row_iter, col_iter), 4))
+                        else:
+                            minimized.add(translate_to_implicant((row_iter, col_iter), 1))
+                    elif surrounding[row_iter + 1][col_iter] == valuable_number:
+                        minimized.add(translate_to_implicant((row_iter, col_iter), 2))
+                    elif surrounding[row_iter][1] == valuable_number:
+                        minimized.add(translate_to_implicant((row_iter, col_iter), 5))
+            elif row_iter == 1:
+                if surrounding[row_iter][1] == valuable_number:
+                    if surrounding[row_iter][2] == valuable_number:
+                        if surrounding[row_iter - 1][1] == valuable_number and surrounding[row_iter - 1][2] == valuable_number:
+                            minimized.add(translate_to_implicant((row_iter, col_iter), 3))
+                        else:
+                            minimized.add(translate_to_implicant((row_iter, col_iter), 0))
+                    elif surrounding[row_iter][0] == valuable_number:
+                        if surrounding[row_iter - 1][1] == valuable_number and surrounding[row_iter - 1][0] == valuable_number:
+                            minimized.add(translate_to_implicant((row_iter, col_iter), 4))
+                        else:
+                            minimized.add(translate_to_implicant((row_iter, col_iter), 1))
+                    elif surrounding[row_iter - 1][col_iter] == valuable_number:
+                        minimized.add(translate_to_implicant((row_iter, col_iter), 2))
+                    elif surrounding[row_iter][1] == valuable_number:
+                        minimized.add(translate_to_implicant((row_iter, col_iter), 5))
             col_iter += 1
+        col_iter = 0
         row_iter += 1
+    minimal_form = ""
+    minimized = list(minimized)
+    if type_of_func == TYPE_OF_FUNC.DISJUNCTIVE:
+        for implicant in range(len(minimized)):
+            if isinstance(minimized[implicant], tuple):
+                minimized[implicant] = "*".join(minimized[implicant])
+            minimal_form += minimized[implicant] + ' + '
+    else:
+        for implicant in range(len(minimized)):
+            if isinstance(minimized[implicant], tuple):
+                minimized[implicant] = "+".join(minimized[implicant])
+            minimal_form += '(' + minimized[implicant] + ')' + ' * '
+    return minimal_form[:len(minimal_form) - 3]
 
 
-minimize_KMap('~a*~b*~c + ~a*b*~c + a*~b*c + a*~b*~c + a*b*~c')
+print(minimize_KMap('~a*~b*~c + ~a*b*~c + a*~b*c + a*~b*~c + a*b*~c'))
