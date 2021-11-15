@@ -1,7 +1,7 @@
 import numpy
 
 
-from utils import (
+from minimizer.utils import (
         TYPE_OF_FUNC,
         find_type_of_function,
         split_function,

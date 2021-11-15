@@ -7,6 +7,7 @@ class READING_STATE(Enum):
     READING_SIMPLE = 0
     READING_INVERSION = 1
 
+
 def check_input(function):
     allowed_symbols = "abc+*~()"
     for i in function:
@@ -145,14 +146,20 @@ def make_pcnf(table):
     row_index = 0
     function = []
     for col_value in table[3]:
-        if col_value == 1: 
+        if col_value == 0:
             a = b = c = 0
-            if table[0][row_index] == 1: a = 'a'
-            else: a = '~a'
-            if table[1][row_index] == 1: b = 'b'
-            else: b = '~b'
-            if table[2][row_index] == 1: c = 'c'
-            else: c = '~c'
+            if table[0][row_index] == 0:
+                a = 'a'
+            else:
+                a = '~a'
+            if table[1][row_index] == 0:
+                b = 'b'
+            else:
+                b = '~b'
+            if table[2][row_index] == 0:
+                c = 'c'
+            else:
+                c = '~c'
             function.append(a + '+' + b + '+' + c)
         row_index += 1
     function = " * ".join(function)
@@ -163,14 +170,20 @@ def make_pdnf(table):
     row_index = 0
     function = []
     for col_value in table[3]:
-        if col_value == 0:
+        if col_value == 1:
             a = b = c = 0
-            if table[0][row_index] == 0: a = 'a'
-            else: a = '~a'
-            if table[1][row_index] == 0: b = 'b'
-            else: b = '~b'
-            if table[2][row_index] == 0: c = 'c'
-            else: c = '~c'
+            if table[0][row_index] == 1:
+                a = 'a'
+            else:
+                a = '~a'
+            if table[1][row_index] == 1:
+                b = 'b'
+            else:
+                b = '~b'
+            if table[2][row_index] == 1:
+                c = 'c'
+            else:
+                c = '~c'
             function.append(a + '*' + b + '*' + c)
         row_index += 1
     function = " + ".join(function)
