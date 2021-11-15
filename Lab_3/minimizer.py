@@ -1,7 +1,7 @@
 import numpy
 
 
-from utils import (
+from minimizer.utils import (
         TYPE_OF_FUNC,
         find_type_of_function,
         split_function,
@@ -116,7 +116,7 @@ def minimize_KMap(perfect_form):
                             minimized.add(translate_to_implicant((row_iter, col_iter), 4))
                         else:
                             minimized.add(translate_to_implicant((row_iter, col_iter), 1))
-                    elif surrounding[row_iter + 1][col_iter] == valuable_number:
+                    elif surrounding[row_iter + 1][1] == valuable_number:
                         minimized.add(translate_to_implicant((row_iter, col_iter), 2))
                     elif surrounding[row_iter][1] == valuable_number:
                         minimized.add(translate_to_implicant((row_iter, col_iter), 5))
@@ -132,7 +132,7 @@ def minimize_KMap(perfect_form):
                             minimized.add(translate_to_implicant((row_iter, col_iter), 4))
                         else:
                             minimized.add(translate_to_implicant((row_iter, col_iter), 1))
-                    elif surrounding[row_iter - 1][col_iter] == valuable_number:
+                    elif surrounding[row_iter - 1][1] == valuable_number:
                         minimized.add(translate_to_implicant((row_iter, col_iter), 2))
                     elif surrounding[row_iter][1] == valuable_number:
                         minimized.add(translate_to_implicant((row_iter, col_iter), 5))
@@ -152,6 +152,3 @@ def minimize_KMap(perfect_form):
                 minimized[implicant] = "+".join(minimized[implicant])
             minimal_form += '(' + minimized[implicant] + ')' + ' * '
     return minimal_form[:len(minimal_form) - 3]
-
-
-print(minimize_KMap('~a*~b*~c + ~a*b*~c + a*~b*c + a*~b*~c + a*b*~c'))
