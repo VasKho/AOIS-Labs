@@ -70,7 +70,7 @@ def de_Morgan_rule(inversion):
     return buffer
 
 
-def to_disjunctive_normal_form(function):
+def resolve_inversions(function):
     function = find_inversion(function)
     temp = function
     while True:

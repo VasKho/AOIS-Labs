@@ -82,15 +82,22 @@ import minimizer
 # test("~a*b+c", 117)
 
 def test(function):
-    pdnf = parser.make_pdnf(parser.build_truth_table(parser.to_disjunctive_normal_form(function)))
+    print()
+    print("function: ", function)
+    
+    print()
+    pdnf = parser.make_pdnf(parser.build_truth_table(parser.resolve_inversions(function)))
+    print("pdnf", pdnf)
+    minimizer.to_end_form(pdnf)
+    
+    pcnf = parser.make_pcnf(parser.build_truth_table(parser.resolve_inversions(function)))
+    print()
+    print("pcnf: ", pcnf)
+    minimizer.to_end_form(pcnf)
 
-    func = minimizer.to_end_form(pdnf)
+# test("~((a+b)*~(b*~c))") 
 
-# func = minimizer.to_end_form(pdnf)
-# print(func)
-
-
-test("~((~a+~b)*~(~a*~c))")
+# test("~((~a+~b)*~(~a*~c))")
 # test("~((~a+~b)*~(~a*c))")
 # test("~((~a+b)*~(~a*~c))")
 # test("~((~a+b)*~(~a*c))")
