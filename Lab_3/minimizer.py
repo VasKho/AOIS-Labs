@@ -1,64 +1,107 @@
+import re
 import numpy
-
+import itertools, functools
 
 from utils import (
         TYPE_OF_FUNC,
+        ImplicantIsNecessary,
         find_type_of_function,
         split_function,
-        represent_in_values,
         joining_rule,
         find_kernel,
         build_KMap,
         find_surrounding,
-        translate_to_implicant
+        translate_to_implicant,
+        convert_to_eval,
+        convert_to_human
 )
 
 
 def to_end_form(function):
-    function = joining_rule(function)
-    function = find_odd(function)
-
-# for implicant in expr
-#     for set_of_values in implicant
-#         if implicant == 1 and expr (without implicant) == 1
-#             then expr.remove(implicant)
+    print("Joining rule: ", joining_rule(function))
+    print("minimize computation: ", str(find_odd(function)))
+    print("minimize Quine", minimize_Quine(function))
+    print("minimize Map", minimize_KMap(function))
 
 
+
+'''
+A function that will check if the implicant is unnecessary
+(computational method for minimizing functions)
+Algorithm:
+1. Find all variables used by the function
+2. For each implicant:
+3. check variables used in the implicant
+4. Check on which valueset_implicant implicant will be equal to 1 (disjunctive)|0 (conjunctive)
+5. Generate array of valueset_function (valueset_implicant + all combinations of remaining variables) 
+6. if for every such valueset_function remainder of function (function - implicant checked) 
+   is equal to 1 (disjunctive)|0 (conjunctive), the checked implicant is unnecessary
+'''
 def find_odd(function):
-    type_of_func = find_type_of_function(function)
+    function = joining_rule(function)
     function_splitted = split_function(function)
-    print(function_splitted)
+    function_type = find_type_of_function(function)
 
-    for implicant in range(len(function_splitted)):
-        print(function_splitted[implicant])
-        for first_value in range(2):
-            for second_value in range(2):
-                form_in_numbers = represent_in_values(function, function_splitted[implicant], first_value, second_value)
+    #Determining the number of variables in the function (by searching for every unique letter)
+    function_variables = set(re.findall(r'[a-z]',function))
 
-                if type_of_func == TYPE_OF_FUNC.DISJUNCTIVE:
-                    splitted_form_in_numbers = form_in_numbers.split(' + ')
-                    print(splitted_form_in_numbers)
-                    implicants = function_splitted
-                    if eval(splitted_form_in_numbers[implicant]) == 1:
-                        implicants.pop(implicant)
-                        result = ''
-                        for addendum_iter in range(len(function_splitted[implicants])):
-                            result += function_splitted[implicants][addendum_iter][0] + "*" + function_splitted[implicants][addendum_iter][1] + ' + '
-                        implicants_in_string = result[: len(result) - 3]
-                        try:
-                            if eval(represent_in_values(implicants_in_string, function_splitted[implicants][0], first_value, second_value)) == 1:
-                                print("YES")
-                                function_splitted.pop(implicant)
-                        except (NameError):
-                            print(function_splitted)
-                            for addendum in form_in_numbers:
-                                if 'True' in addendum:
-                                    addendum.remove('True')
-                            pass
-                else:
-                    print('this func is in conjunctive form')
-                    # TODO: add for conjunctive form
-    return function_splitted
+    for implicant in function_splitted:
+        try:
+        #find all variables used by an implicant
+            implicant_variables = set(re.findall(r'[a-z]',"".join(implicant)))
+            function_remainder = function_splitted[:]
+            function_remainder.remove(implicant)
+
+            #generate valuesets for the implicant to
+            implicant_combinations = itertools.product(range(2), repeat=len(implicant_variables))
+
+            #convert them to a dict for eval (looks like {"var1": value_1, "var2": value_2} )
+            # implicant_valuesets = []
+            # for combination in implicant_combinations:
+            #     implicant_valuesets.insert
+            implicant_valuesets = [{list(implicant_variables)[ind]: val for ind,val in enumerate(combination)} for combination in implicant_combinations]
+                
+
+            #finding the valueset when implicant is equal to 0|1
+            control_valueset = {}
+            for valueset in implicant_valuesets:
+                if (eval(convert_to_eval([implicant], function_type), valueset) == function_type.value):
+                    control_valueset = valueset
+            
+            #if the remaining function is still 0|1 on this valueset, it means that the implicant is unnecessary
+            #let's complete the valueset we're checking to all combinations of variables in the remaining function
+            variables_to_complete = function_variables - implicant_variables
+            #generate combinations
+            combinations_for_completion = itertools.combinations(range(2), len(variables_to_complete))
+
+            #for each combination of remaining variables, create a valueset of control_valueset (implicant) + variables_to_complete combination
+            combinations_for_completion = [{ list(variables_to_complete)[ind]: val for ind,val in enumerate(valueset)} for valueset in combinations_for_completion]
+            
+
+            # valueset = completion variables, control_valueset = valueset when implicant is equal to 1|0, | is the "+" for dicts, basically (merge)
+            for valueset in combinations_for_completion:
+                #if on any valueset we generated the value is not the same as on implicant, the implicant is NOT unnecessary
+                if (eval(convert_to_eval(function_remainder, function_type), {**valueset, **control_valueset}) is not function_type.value): 
+                    raise ImplicantIsNecessary()
+
+            #this code is unaccessable unless the previous check shown that implicant is UNnecessary
+            function_splitted.remove(implicant)
+
+        except ImplicantIsNecessary: 
+            continue
+    return convert_to_human(function_splitted,function_type)
+
+
+
+
+
+
+
+
+
+        
+
+
 
 
 def minimize_Quine(perfect_form):
