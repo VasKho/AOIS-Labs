@@ -1,7 +1,7 @@
 import numpy
 
 
-from utils import (
+from minimizer.utils import (
         TYPE_OF_FUNC,
         find_type_of_function,
         split_function,
@@ -99,7 +99,6 @@ def minimize_KMap(perfect_form):
     type_of_func = find_type_of_function(perfect_form)
     if type_of_func == TYPE_OF_FUNC.CONJUNCTIVE:
         valuable_number = 0
-    print(valuable_number)
     minimized = set()
     col_iter, row_iter = 0, 0
     while row_iter < KMap_template.shape[0]:

@@ -1,6 +1,6 @@
 import numpy
 import re
-from minimizer.minimizer import minimize_KMap
+from minimizer.minimizer import (minimize_KMap, minimize_Quine)
 from minimizer.parser import make_pdnf
 
 
@@ -79,8 +79,12 @@ carry_table = [
 
 
 def adder(a, b, c):
+    print("Adder PDNF: ", make_pdnf(adder_table))
     adder_function = minimize_KMap(make_pdnf(adder_table))
+    print("Adder minimized: ", adder_function, "\n")
+    print("Carry PDNF: ", make_pdnf(carry_table))
     carry_function = minimize_KMap(make_pdnf(carry_table))
+    print("Carry minimized: ", carry_function, "\n")
     output = (adder_function, carry_function)
     a = bool(a)
     b = bool(b)
@@ -94,21 +98,65 @@ def adder(a, b, c):
     return (int(eval(result[0])), int(eval(result[1])))
 
 
-# for i in range(2):
-#     for j in range(2):
-#         for k in range(2):
-#             for z in range(2):
-#                 num = "".join(str(i) for i in [i, j, k, z])
-#                 num = int(num, 2)
-#                 print(bin(num), bin(num + 2))
+out1_table = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1],
+        [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+        ]
+
+out2_table = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1],
+        [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+        [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+
+out3_table = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1],
+        [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+        [1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]
+        ]
+
+out4_table = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1],
+        [0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0]
+        ]
 
 
-table = build_truth_table_4_vars("~a*b*c + a*~b*~c")
+def convert_8421_2(a, b, c, d):
+    out1 = make_pdnf_4_vars(out1_table)
+    print("Out 1 ", out1)
+    print("Minimized: ", minimize_Quine(out1), '\n')
+    out2 = make_pdnf_4_vars(out2_table)
+    print("Out 2 ", out2)
+    print("Minimized: ", minimize_Quine(out2), '\n')
+    out3 = make_pdnf_4_vars(out3_table)
+    print("Out 3 ", out3)
+    print("Minimized: ", minimize_Quine(out3), '\n')
+    out4 = make_pdnf_4_vars(out4_table)
+    print("Out 4 ", out4)
+    print("Minimized: ", minimize_Quine(out4), '\n')
+    output = (out1, out2, out3, out4)
+    a = bool(a)
+    b = bool(b)
+    c = bool(c)
+    d = bool(d)
+    result = []
+    for out in output:
+        out = re.sub(r"~", "not ", out)
+        out = re.sub(r"\*", " and ", out)
+        out = re.sub(r"\+", " or ", out)
+        result.append(out)
+    return (int(eval(result[0])), int(eval(result[1])), int(eval(result[2])), int(eval(result[3])))
 
-print(table)
 
-pdnf = make_pdnf_4_vars(table)
-
-print(pdnf)
-
-print(build_truth_table_4_vars(pdnf))
+adder(0, 1, 0)
+convert_8421_2(0, 0, 1, 1)

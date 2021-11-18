@@ -1,4 +1,5 @@
 import numpy
+from minimizer.minimizer import minimize_Quine
 
 
 def make_pdnf_4_vars(table):
@@ -76,8 +77,11 @@ def start_counter(number_of_iters):
 
 start_counter(16)
 
+print("Last state")
 print(last_state)
+print("Current state")
 print(current_state)
+print("Powered state")
 print(horny_state)
 print()
 
@@ -87,6 +91,9 @@ horny_trigger2 = make_pdnf_4_vars(numpy.vstack((last_state, horny_state[1])))
 horny_trigger3 = make_pdnf_4_vars(numpy.vstack((last_state, horny_state[0])))
 
 
-print(horny_trigger3)
-print(horny_trigger2)
-print(horny_trigger1)
+print("Trigger_3: ", horny_trigger3)
+print("Minimized: ", minimize_Quine(horny_trigger3))
+print("Trigger_2: ", horny_trigger2)
+print("Minimized: ", minimize_Quine(horny_trigger2))
+print("Trigger_1: ", horny_trigger1)
+print("Minimized: ", minimize_Quine(horny_trigger1))
