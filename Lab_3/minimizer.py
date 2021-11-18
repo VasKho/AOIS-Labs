@@ -24,7 +24,6 @@ def to_end_form(function):
     print("minimize Map", minimize_KMap(function))
 
 
-
 '''
 A function that will check if the implicant is unnecessary
 (computational method for minimizing functions)
@@ -37,71 +36,59 @@ Algorithm:
 6. if for every such valueset_function remainder of function (function - implicant checked) 
    is equal to 1 (disjunctive)|0 (conjunctive), the checked implicant is unnecessary
 '''
+
+
 def find_odd(function):
     function = joining_rule(function)
     function_splitted = split_function(function)
     function_type = find_type_of_function(function)
 
-    #Determining the number of variables in the function (by searching for every unique letter)
-    function_variables = set(re.findall(r'[a-z]',function))
+    # Determining the number of variables in the function (by searching for every unique letter)
+    function_variables = set(re.findall(r'[a-z]', function))
 
     for implicant in function_splitted:
         try:
-        #find all variables used by an implicant
-            implicant_variables = set(re.findall(r'[a-z]',"".join(implicant)))
+            # find all variables used by an implicant
+            implicant_variables = set(re.findall(r'[a-z]', "".join(implicant)))
             function_remainder = function_splitted[:]
             function_remainder.remove(implicant)
 
-            #generate valuesets for the implicant to
+            # generate valuesets for the implicant to
             implicant_combinations = itertools.product(range(2), repeat=len(implicant_variables))
 
-            #convert them to a dict for eval (looks like {"var1": value_1, "var2": value_2} )
+            # convert them to a dict for eval (looks like {"var1": value_1, "var2": value_2} )
             # implicant_valuesets = []
             # for combination in implicant_combinations:
             #     implicant_valuesets.insert
-            implicant_valuesets = [{list(implicant_variables)[ind]: val for ind,val in enumerate(combination)} for combination in implicant_combinations]
-                
+            implicant_valuesets = [{list(implicant_variables)[ind]: val for ind, val in enumerate(combination)} for combination in implicant_combinations]
 
-            #finding the valueset when implicant is equal to 0|1
+            # finding the valueset when implicant is equal to 0|1
             control_valueset = {}
             for valueset in implicant_valuesets:
                 if (eval(convert_to_eval([implicant], function_type), valueset) == function_type.value):
                     control_valueset = valueset
-            
-            #if the remaining function is still 0|1 on this valueset, it means that the implicant is unnecessary
-            #let's complete the valueset we're checking to all combinations of variables in the remaining function
+
+            # if the remaining function is still 0|1 on this valueset, it means that the implicant is unnecessary
+            # let's complete the valueset we're checking to all combinations of variables in the remaining function
             variables_to_complete = function_variables - implicant_variables
-            #generate combinations
+            # generate combinations
             combinations_for_completion = itertools.combinations(range(2), len(variables_to_complete))
 
-            #for each combination of remaining variables, create a valueset of control_valueset (implicant) + variables_to_complete combination
-            combinations_for_completion = [{ list(variables_to_complete)[ind]: val for ind,val in enumerate(valueset)} for valueset in combinations_for_completion]
-            
+            # for each combination of remaining variables, create a valueset of control_valueset (implicant) + variables_to_complete combination
+            combinations_for_completion = [{list(variables_to_complete)[ind]: val for ind, val in enumerate(valueset)} for valueset in combinations_for_completion]
 
             # valueset = completion variables, control_valueset = valueset when implicant is equal to 1|0, | is the "+" for dicts, basically (merge)
             for valueset in combinations_for_completion:
-                #if on any valueset we generated the value is not the same as on implicant, the implicant is NOT unnecessary
-                if (eval(convert_to_eval(function_remainder, function_type), {**valueset, **control_valueset}) is not function_type.value): 
+                # if on any valueset we generated the value is not the same as on implicant, the implicant is NOT unnecessary
+                if (eval(convert_to_eval(function_remainder, function_type), {**valueset, **control_valueset}) is not function_type.value):
                     raise ImplicantIsNecessary()
 
-            #this code is unaccessable unless the previous check shown that implicant is UNnecessary
+            # this code is unaccessable unless the previous check shown that implicant is UNnecessary
             function_splitted.remove(implicant)
 
-        except ImplicantIsNecessary: 
+        except ImplicantIsNecessary:
             continue
-    return convert_to_human(function_splitted,function_type)
-
-
-
-
-
-
-
-
-
-        
-
-
+    return convert_to_human(function_splitted, function_type)
 
 
 def minimize_Quine(perfect_form):
@@ -142,7 +129,6 @@ def minimize_KMap(perfect_form):
     type_of_func = find_type_of_function(perfect_form)
     if type_of_func == TYPE_OF_FUNC.CONJUNCTIVE:
         valuable_number = 0
-    print(valuable_number)
     minimized = set()
     col_iter, row_iter = 0, 0
     while row_iter < KMap_template.shape[0]:
