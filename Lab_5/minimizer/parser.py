@@ -70,7 +70,7 @@ def de_Morgan_rule(inversion):
     return buffer
 
 
-def resolve_inversions(function):
+def to_disjunctive_normal_form(function):
     function = find_inversion(function)
     temp = function
     while True:
@@ -89,7 +89,6 @@ def normalize(function):
         function = re.sub(r"(~~)+\w", replace_char, function, 1)
         find_something = re.search(r"(~~)+\w", function)
     return function
-
 
 def build_truth_table(function):
     function = re.sub(r'\+', ' | ', function)
@@ -151,11 +150,8 @@ def make_pcnf(table):
                 c = '~c'
             function.append(a + '+' + b + '+' + c)
         j += 1
-    # function = " * ".join(function)
-    result = ""
-    for elem in function:
-        result += '(' + elem + ')' + ' * '
-    return result[: len(result) - 3]
+    function = " * ".join(function)
+    return function
 
 
 def make_pdnf(table):
