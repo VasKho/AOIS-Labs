@@ -5,9 +5,14 @@ from parser import build_truth_table
 
 
 class TYPE_OF_FUNC(Enum):
-    DISJUNCTIVE = 0
-    CONJUNCTIVE = 1
+    CONJUNCTIVE = 0
+    DISJUNCTIVE = 1
 
+class ImplicantIsNecessary(Exception):
+    pass
+
+class ImplicantIsUnnecessary(Exception):
+    pass
 
 def translate_to_implicant(pair, entrance):
     surrounding_translator = [
@@ -38,6 +43,33 @@ def find_type_of_function(function):
     if result_flag is None:
         raise Exception("Invalid input!")
     return type_of_func
+
+#gets array of implicants as an input
+def convert_to_eval(implicants, function_type):
+        ##WARN! Could break if you'll change the Enum "TYPE_OF_FUNC"
+        #concatenate expression to one string
+        if (function_type == TYPE_OF_FUNC.CONJUNCTIVE):
+            implicants = [" or ".join(impl) for impl in implicants]
+            eval_string = " and ".join(implicants)
+        else:
+            #convert individual implicants to strings
+            implicants = [" and ".join(impl) for impl in implicants]
+            eval_string = " or ".join(implicants) 
+        eval_string = re.sub('~', ' not ', eval_string)
+        return eval_string
+
+def convert_to_human(implicants, function_type):
+        ##WARN! Could break if you'll change the Enum "TYPE_OF_FUNC"
+        #concatenate expression to one string
+        if (function_type == TYPE_OF_FUNC.CONJUNCTIVE):
+            implicants = ["+".join(impl) for impl in implicants]
+            eval_string = " * ".join(implicants)
+        else:
+            #convert individual implicants to strings
+            implicants = ["*".join(impl) for impl in implicants]
+            eval_string = " + ".join(implicants) 
+        eval_string = re.sub(' not ', '~', eval_string)
+        return eval_string
 
 
 def represent_in_values(function, implicant, first_value, second_value):
