@@ -50,11 +50,11 @@ def convert_to_eval(implicants, function_type):
         #concatenate expression to one string
         if (function_type == TYPE_OF_FUNC.CONJUNCTIVE):
             implicants = [" or ".join(impl) for impl in implicants]
-            eval_string = " and ".join(implicants)
+            eval_string = "(" + ") and (".join(implicants) + ")"
         else:
             #convert individual implicants to strings
             implicants = [" and ".join(impl) for impl in implicants]
-            eval_string = " or ".join(implicants) 
+            eval_string = "(" + ") or (".join(implicants) + ")"
         eval_string = re.sub('~', ' not ', eval_string)
         return eval_string
 
@@ -63,11 +63,11 @@ def convert_to_human(implicants, function_type):
         #concatenate expression to one string
         if (function_type == TYPE_OF_FUNC.CONJUNCTIVE):
             implicants = ["+".join(impl) for impl in implicants]
-            eval_string = " * ".join(implicants)
+            eval_string = "(" +") * (".join(implicants) + ")"
         else:
             #convert individual implicants to strings
             implicants = ["*".join(impl) for impl in implicants]
-            eval_string = " + ".join(implicants) 
+            eval_string = "(" + ") + (".join(implicants)  + ")"
         eval_string = re.sub(' not ', '~', eval_string)
         return eval_string
 
