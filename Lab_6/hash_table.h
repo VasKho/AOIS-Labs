@@ -12,10 +12,11 @@ struct hash_queue
     hash_queue* previous;
 };
 
-void hash_queue_push_front(hash_queue**, const char*, char*);
-void hash_queue_pop_front(hash_queue**);
+void hash_queue_push(hash_queue**, const char*, const char*);
+void hash_queue_pop(hash_queue**);
 void hash_queue_delete(hash_queue**, const char*);
 char* hash_queue_find(hash_queue*, const char*);
+void hash_queue_free(hash_queue**);
 
 
 typedef struct hash_table hash_table;
@@ -30,7 +31,7 @@ struct hash_table
 
 
 hash_table* hash_table_create(int);
-void hash_table_destroy(hash_table*);
+void hash_table_free(hash_table*);
 void hash_table_insert(hash_table*, const char*, char*);
 void hash_table_delete(hash_table*, const char*);
 char* hash_table_find(hash_table*, const char*);
