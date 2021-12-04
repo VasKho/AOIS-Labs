@@ -9,8 +9,8 @@ void hash_queue_push(hash_queue** queue, const char* key, const char* info)
     hash_queue* new_note = (hash_queue*)malloc(sizeof(hash_queue));
     new_note->key = (char*)malloc(strlen(key) * sizeof(char) + 1);
     new_note->value = (char*)malloc(strlen(info) * sizeof(char) + 1);
-    strcpy(new_note->key, key);
-    strcpy(new_note->value, info);
+    strncpy(new_note->key, key, strlen(key));
+    strncpy(new_note->value, info, strlen(info));
     if (*queue == NULL)
     {
         new_note->next = NULL;
@@ -43,6 +43,14 @@ void hash_queue_delete(hash_queue** queue, const char* key)
             if (del->previous != NULL) del->previous->next = del->next;
             else 
             {
+                if (del->next == NULL)
+                {
+                    free(del->key);
+                    free(del->value);
+                    free(del);
+                    *queue = NULL;
+                    return;
+                }
                 del->next->previous = NULL;
                 *queue = del->next;
             }
@@ -65,7 +73,7 @@ char* hash_queue_find(hash_queue* queue, const char* key)
         if (strcmp(temp->key, key) == 0) return temp->value;
         temp = temp->next;
     }
-    printf("No such element in queue");
+    printf("\"%s\" no such element in queue", key);
     return "";
 }
 
@@ -108,8 +116,8 @@ void hash_table_insert(hash_table* table, const char* key, char* info)
     {
         table[position].key = (char*)malloc(strlen(key) * sizeof(char) + 1);
         table[position].value = (char*)malloc(strlen(info) * sizeof(char) + 1);
-        strcpy(table[position].key, key);
-        strcpy(table[position].value, info);
+        strncpy(table[position].key, key, strlen(key));
+        strncpy(table[position].value, info, strlen(key));
     }
     else
     {
@@ -149,13 +157,13 @@ char* hash_table_find(hash_table* table, const char* key)
     int position = get_hash(key) % table->size;
     if (position >= table->size)
     {
-        printf("No such element in hash table");
+        printf("\"%s\" no such element in hash table", key);
         return "";
     }
-    if (strcmp(table[position].key, key) == 0) return table[position].value;
+    if (table[position].key != NULL && strcmp(table[position].key, key) == 0) return table[position].value;
     if (table[position].same_hash_list == NULL)
     {
-        printf("No such element in hash table");
+        printf("\"%s\" no such element in hash table", key);
         return "";
     }
     return hash_queue_find(table[position].same_hash_list, key);
