@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "hash_table.h"
+#include <math.h>
 
 
 void hash_queue_push(hash_queue** queue, const char* key, const char* info)
@@ -168,6 +169,7 @@ char* hash_table_find(hash_table* table, const char* key)
     }
     return hash_queue_find(table[position].same_hash_list, key);
 }
+
 
 unsigned long get_hash(const char* key)
 {

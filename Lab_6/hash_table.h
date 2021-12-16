@@ -36,5 +36,6 @@ void hash_table_insert(hash_table*, const char*, char*);
 void hash_table_delete(hash_table*, const char*);
 char* hash_table_find(hash_table*, const char*);
 
+
 unsigned long get_hash(const char*);
 #endif
