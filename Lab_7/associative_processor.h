@@ -5,7 +5,6 @@
 
 #define SIZE_OF_MEMORY 40
 #define WORD_SIZE 10
-#define SEARCH_ACCURACY 6
 
 enum direction {up = 0, down = 1};
 
